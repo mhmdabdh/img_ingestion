@@ -1,0 +1,176 @@
+openapi: 3.0.0
+info:
+  description: Annalise Backend API
+  version: 1.0.0
+  license:
+    name: Proprietary
+    url: 'https://annalise.ai'
+  title: Annalise Backend API
+  contact:
+    email: productdevelopment@annalise.ai
+paths:
+  /v1/images/upload:
+    post:
+      tags:
+        - Images
+      summary: Upload an image for AI processing.
+      description: |
+        Upload a study image for AI processing. The images should be base64-encoded.
+      operationId: uploadImage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - study
+                - series
+                - images
+              properties:
+                study:
+                  type: object
+                  required:
+                    - studyInstanceUid
+                    - accessionNumber
+                    - patientId
+                  properties:
+                    studyInstanceUid:
+                      type: string
+                      description: A DICOM defined unique ID to represent the study resource. DICOM tag (0020,000D).
+                      example: '1.2.826.0.1.3680043.8.498.11611077874888537372076640106299467576'
+                    accessionNumber:
+                      type: string
+                      description: A Worklist generated ID that identifies the order for the Study. DICOM tag (0008,0050).
+                      example: '10.1234'
+                    patientId:
+                      type: string
+                      description: Primary identifier for the Patient. DICOM tag (0010, 0020).
+                      example: '77.1234'
+                    patientAge:
+                      type: string
+                      description: Patient age.  DICOM tag (0010, 1010).
+                      example: 018Y
+                      pattern: ^\d+Y$
+                series:
+                  type: object
+                  required:
+                    - seriesInstanceUid
+                  properties:
+                    seriesInstanceUid:
+                      type: string
+                      description: A DICOM defined unique ID to represent the series resource. DICOM tag (0020,000E).
+                      example: '1.2.826.0.1.3680043.8.498.11611077874888537372076640106299467576'
+                images:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - imageInstanceUid
+                      - sopClassUid
+                      - height
+                      - width
+                      - rescaleSlope
+                      - rescaleIntercept
+                      - photometricInterpretation
+                      - samplesPerPixel
+                      - bitsAllocated
+                      - bitsStored
+                      - highBit
+                      - data
+                    properties:
+                      imageInstanceUid:
+                        type: string
+                        description: A DICOM defined unique ID to represent the image resource used in prediction. DICOM tag (0008,0018).
+                        example: '1.2.826.0.1.3680043.8.498.11611077874888537372076640106299467576'
+                      sopClassUid:
+                        type: string
+                        description: A DICOM defined unique id to represent a SOP class. DICOM tag (0008,0016).
+                        example: '1.2.840.10008.5.1.4.1.1.1'
+                      height:
+                        type: integer
+                        description: Height (rows) of image in pixels. DICOM tag (0028,0010).
+                        minimum: 1
+                        example: 1666
+                      width:
+                        type: integer
+                        description: Width (columns) of image in pixels. DICOM tag (0028,0011).
+                        minimum: 1
+                        example: 1746
+                      rescaleSlope:
+                        type: integer
+                        description: m in the equation specified by Rescale Intercept. DICOM tag (0028,1053).
+                        minimum: 1
+                      rescaleIntercept:
+                        type: number
+                        description: The value b in relationship between stored values (SV) and the output units specified in Rescale Type. DICOM tag (0028,1054).
+                        format: double
+                        example: 0
+                      photometricInterpretation:
+                        type: string
+                        description: Specifies the intended interpretation of the image pixel data (e.g. MONOCHROME1, RGB). DICOM tag (0028,0004).
+                        enum:
+                          - MONOCHROME1
+                          - MONOCHROME2
+                          - PALETTE COLOR
+                          - RGB
+                          - YBR_FULL
+                          - YBR_FULL_422
+                          - YBR_PARTIAL_422
+                          - YBR_PARTIAL_420
+                          - YBR_ICT
+                          - YBR_RCT
+                      bitsAllocated:
+                        type: integer
+                        description: Represents the range of values each pixel in the image could be taken on. DICOM tag (0028,0100).
+                        minimum: 8
+                        example: 16
+                      bitsStored:
+                        type: integer
+                        description: The number of bits per channel for DICOM image. DICOM tag (0028,0101).
+                        minimum: 1
+                        example: 14
+                      highBit:
+                        type: integer
+                        description: The number of bits per channel for DICOM image. DICOM tag (0028,0102).
+                        minimum: 1
+                        example: 13
+                      data:
+                        type: string
+      responses:
+        '200':
+          description: Upload image response success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: string
+                    example: ok
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: 400
+                  message:
+                    type: string
+                    example: Bad Request
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: 500
+                  message:
+                    type: string
+                    example: Internal Server Error
