@@ -8,26 +8,15 @@ import base64
 img_location = "./local_dcm"
 # Read dataset from C-Store location
 dicom_files = list(get_files(img_location, pattern="*.dcm"))
-# print(dicom_files)
-
-cleaned_location = "./local_dcm_dicomcleaner"
-# print(cleaned_location)
-
-encoding_files = list(get_files(cleaned_location, pattern="*.jpg"))
-print(encoding_files)
-
 
 def poll_dcm_directory():
     cust_directory = []
     count = 0
     for fol in sorted(os.scandir('./local_dcm'), key=lambda sortdir: sortdir.name):
-        print(fol.name)
         cust_directory.append(fol.name)
-    # print(cust_directory)
     for dir_name in cust_directory:
         dir_name = (
                 "./local_dcm/" + (dir_name) + "/")
-        print(dir_name)
         if len(os.listdir(dir_name)) == 0:
             print("No new images to process!")
         else:
@@ -40,8 +29,8 @@ def poll_dcm_directory():
         image_dicomecleaner(img_location)
 
 
-def img_dataset_cleanup():
-    cleaned_path = "./local_dcm_cleaned/"
+def img_manual_scrub():
+    cleaned_path = "manual_dcm_cleaned/"
     cleanup_metadata = ['Modality', 'PatientAge', 'PatientID', 'PatientSex', 'PhotometricInterpretation', 'SOPClassUID',
                         'SOPInstanceUID', 'SeriesInstanceUID', 'StudyDescription', 'StudyInstanceUID']
 
@@ -62,14 +51,14 @@ def img_dataset_cleanup():
         print(dcm_filename)
         shutil.move(each_image, cleaned_path)
 
-
 def image_dicomecleaner(img_source):
     images_path = os.listdir(img_source)
     print(images_path)
     for each_image in dicom_files:
-        print(each_image)
         client = DicomCleaner(output_folder="./local_dcm_dicomcleaner")
         # client = DicomCleaner(output_folder=".")
+        current_working_directory = os.getcwd()
+        print(current_working_directory)
         client.detect(each_image)
         client.clean()
         client.save_png()
@@ -80,23 +69,19 @@ def image_dicomecleaner(img_source):
 def file_encoding():
     cleaned_location = "./local_dcm_dicomcleaner"
     print(cleaned_location)
-    path = './local_dcm_dicomcleaner'
-    files = [x for x in os.listdir(path) if x.endswith('.png')]
-    print(files)
-    print(encoding_files)
+    files = [pngfile for pngfile in os.listdir(cleaned_location) if pngfile.endswith('.png')]
     for each_image in files:
         print("Encoding......", each_image)
-        with open(each_image, "rb") as image_file:
+        loc_each_image = (cleaned_location + "/" + each_image)
+        with open(loc_each_image, "rb") as image_file:
             encoded_string = base64.b64encode(image_file.read())
-        #print(encoded_string)
         filename = (each_image + ".txt")
-        print(filename)
         base64_file = open(filename, "wb")
-        a = base64_file.write(encoded_string)
+        writer = base64_file.write(encoded_string)
         base64_file.close()
-        print(a)
+        print(writer)
+        shutil.move(filename, "./encoded_images")
 
 if __name__ == '__main__':
     poll_dcm_directory()
-    #img_dataset_cleanup() # manual scrub to deidentify data , may not be required
-
+    #img_manual_scrub()  # manual scrub to deidentify data , may not be required
