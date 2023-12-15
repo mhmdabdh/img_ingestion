@@ -1,11 +1,8 @@
 import pydicom
-from deid.dicom import get_files, DicomCleaner, has_burned_pixels
+from deid.dicom import get_files, DicomCleaner
 import shutil
 import os
-import numpy as np
-from PIL import Image
 import pathlib
-import cv2
 import base64
 
 
@@ -49,20 +46,15 @@ def img_dataset_cleanup():
                         'SOPInstanceUID', 'SeriesInstanceUID', 'StudyDescription', 'StudyInstanceUID']
 
     for each_image in dicom_files:
-        # print(each_image)
         image_metadata = pydicom.dcmread(each_image)
-        # print(image_metadata.PatientAge)
         for val in cleanup_metadata:
             print(val)
-            # print(image_metadata.val)
             print(getattr(image_metadata, val))
             setattr(image_metadata, val, None)
 
         filename = each_image
-        # print(filename)
         image_metadata.save_as(filename)
         image_cleaned = pydicom.dcmread(filename)
-        print("buzz1")
         print(image_cleaned)
 
         dcm_filename = pathlib.Path(each_image).stem
@@ -101,6 +93,6 @@ def encoding_lasttry():
 
 if __name__ == '__main__':
     poll_dcm_directory()
-    # img_dataset_cleanup() #f3 manual scrub, keeping it
+    img_dataset_cleanup() #manual scrub to deidentify data
     # image_dicomecleaner(img_location) #f4 does everything except, base64 try it
     encoding_lasttry()
