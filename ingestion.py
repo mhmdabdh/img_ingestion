@@ -9,6 +9,7 @@ img_location = "./local_dcm"
 # Read dataset from C-Store location
 dicom_files = list(get_files(img_location, pattern="*.dcm"))
 
+
 def poll_dcm_directory():
     cust_directory = []
     count = 0
@@ -16,7 +17,7 @@ def poll_dcm_directory():
         cust_directory.append(fol.name)
     for dir_name in cust_directory:
         dir_name = (
-                "./local_dcm/" + (dir_name) + "/")
+                "./local_dcm/" + dir_name + "/")
         if len(os.listdir(dir_name)) == 0:
             print("No new images to process!")
         else:
@@ -26,7 +27,7 @@ def poll_dcm_directory():
     if count == 0:
         exit()
     else:
-        image_dicomecleaner(img_location)
+        image_dicomcleaner(img_location)
 
 
 def img_manual_scrub():
@@ -51,7 +52,8 @@ def img_manual_scrub():
         print(dcm_filename)
         shutil.move(each_image, cleaned_path)
 
-def image_dicomecleaner(img_source):
+
+def image_dicomcleaner(img_source):
     images_path = os.listdir(img_source)
     print(images_path)
     for each_image in dicom_files:
@@ -65,6 +67,7 @@ def image_dicomecleaner(img_source):
         client.save_dicom()
 
     file_encoding()
+
 
 def file_encoding():
     cleaned_location = "./local_dcm_dicomcleaner"
@@ -82,6 +85,7 @@ def file_encoding():
         print(writer)
         shutil.move(filename, "./encoded_images")
 
+
 if __name__ == '__main__':
     poll_dcm_directory()
-    #img_manual_scrub()  # manual scrub to deidentify data , may not be required
+    # img_manual_scrub()  # manual scrub to deidentify data , may not be required
