@@ -56,7 +56,7 @@ Functions:
    as image.png.txt . These .txt files have to be sent to the backend via OpenAPI and can be decoded at the destination.
    There were issues in the swagger function so unable to perform the POST request.
 
-4. img_manual_scrub()
+4. **img_manual_scrub()**
    The initial implementation of deidentification was carried out manually. It appears that the DicomCleaner is not
    cleaning the images properly (based on test results). Even after scrubbing, if we read the metadata we are able to
    see the PHI. This function is retained to demonstrate that we can choose our fields and deidentify them. An
@@ -64,42 +64,69 @@ Functions:
    However, this cannot be viewed on dicom viewer nor can it be converted to jpg or png. This is an isolated function
    and has a direct call from **_main_** if required, otherwise not necessarily a part of the program.
 
-GATEWAY_BUNDLE The gateway_bundle.yaml was converted to python using the swagger function. The purpose of swagger client
+
+**GATEWAY_BUNDLE** 
+The gateway_bundle.yaml was converted to python using the swagger function. The purpose of swagger client
 is to send these encoded files to the destination server using REST API calls. This requirement could not be met due to
 lack of experience with OpenAPI.
 
-HOW TO RUN THE PROGRAM:
+**HOW TO RUN THE PROGRAM:**
 
 1. Clone the repo to local machine
 2. Open terminal and run as follows:    
    $ python3 ingestion.py
-3. Dicom Images will be picked from customer folders, cleaned, converted and saved in ./local_dcm_dicomcleaner
-4. PNG images will be picked from ./local_dcm_dicomcleaner base64 encoded and saved in ./encoded_images
+3. Dicom Images will be picked from customer folders, cleaned, converted and saved in **./local_dcm_dicomcleaner**
+4. PNG images will be picked from **./local_dcm_dicomcleaner** base64 encoded and saved in **./encoded_images**
 5. Missing function - pushing the base64 encoded files to backend.
 6. Sample output:
-   terminal$ python3 ingestion.py New images received for processing..... Scrubbing
-   ./local_dcm/customer_2/dicom_00000005_000.dcm. Scrubbing ./local_dcm/customer_2/dicom_00000004_000.dcm.
-   Encoding...... cleaned-dicom_00000005_000.png 226700 Encoding...... cleaned-dicom_00000004_000.png 226700
+
+terminal$ python3 ingestion.py 
+New images received for processing..... 
+Scrubbing ./local_dcm/customer_2/dicom_00000005_000.dcm. 
+Scrubbing ./local_dcm/customer_2/dicom_00000004_000.dcm.
+Encoding...... cleaned-dicom_00000005_000.png 226700 
+Encoding...... cleaned-dicom_00000004_000.png 226700
+Processing Complete!
+
+
 
 PART 2:
-• What would your ideal environment look like and how does this fit into it? The ideal environment would be like this:
+• What would your ideal environment look like and how does this fit into it? 
+
+The ideal environment would be like this:
 S3 for receiving the images, Orchestration tool (Jenkins/GitLab CI) to read the bucket contents, processing will happen
-on the tool itself (instance or container) and processed filed will be pushed. • How are subsequent deployments made?
+on the tool itself (instance or container) and processed filed will be pushed. 
+
+
+• How are subsequent deployments made?
 The python scripts are stored in GitHub, all changes to be done via SCM. This automation need not be hosted on any
 server, it can be converted into a docker image and stored in ECR. The orchestration tool can pull the image from ECR
 and execute the ingestion.py inside a container which will have access to EFS for storing the files. The files will be
-pushed from EFS to the backend system. • How could you avoid downtime during deployments? We can adopt a GitOps model as
-well. This can be deployed in EKS pods which will pull the image and always be in live state.
+pushed from EFS to the backend system. 
+
+
+• How could you avoid downtime during deployments? 
+
+We could adopt a GitOps model as well. This can be deployed in EKS pods which will pull the image and always be in live state.
+
 
 • Assuming a stateless application, what does immutable infrastructure look like? The ingestion application needs no
 front end module, is only going to pull dicom images based on some type of cron schedule, process them in a particular
 infrastructure and them push them to the infrastructure. In AWS terms, as stated earlier, S3, EC2, EKS, IAM, ECR would
-be sufficient to run this. • What was missed in this implementation? The functionality of pushing the encoded images via
-API to another system. Reg de-identification, it is still not clear why DicomCleaner is not cleaning up as per this
+be sufficient to run this. 
+
+
+• What was missed in this implementation? 
+The functionality of pushing the encoded images via  API to another system. Reg de-identification, it is still not clear why DicomCleaner is not cleaning up as per this
 file:
 https://github.com/pydicom/deid/blob/467b8bd76c6578683c47600b7194e3caed500fd9/deid/data/deid.dicom#L829
-• What would you have liked to have added? 1. Cleanup policy for each of the directories 2. Archival system for all dcm
+
+
+• What would you have liked to have added? 
+1. Cleanup policy for each of the directories 2. Archival system for all dcm
 files received from customers 3. Error handling in case fof junk files/very large files received
+
+
 
 References:
 
