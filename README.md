@@ -91,6 +91,7 @@ Processing Complete!
 
 
 PART 2:
+
 • What would your ideal environment look like and how does this fit into it? 
 
 The ideal environment would be like this:
@@ -99,6 +100,7 @@ on the tool itself (instance or container) and processed filed will be pushed.
 
 
 • How are subsequent deployments made?
+
 The python scripts are stored in GitHub, all changes to be done via SCM. This automation need not be hosted on any
 server, it can be converted into a docker image and stored in ECR. The orchestration tool can pull the image from ECR
 and execute the ingestion.py inside a container which will have access to EFS for storing the files. The files will be
@@ -110,21 +112,26 @@ pushed from EFS to the backend system.
 We could adopt a GitOps model as well. This can be deployed in EKS pods which will pull the image and always be in live state.
 
 
-• Assuming a stateless application, what does immutable infrastructure look like? The ingestion application needs no
-front end module, is only going to pull dicom images based on some type of cron schedule, process them in a particular
+• Assuming a stateless application, what does immutable infrastructure look like?
+
+The ingestion application needs no front end module, is only going to pull dicom images based on some type of cron schedule, process them in a particular
 infrastructure and them push them to the infrastructure. In AWS terms, as stated earlier, S3, EC2, EKS, IAM, ECR would
 be sufficient to run this. 
 
 
 • What was missed in this implementation? 
+
 The functionality of pushing the encoded images via  API to another system. Reg de-identification, it is still not clear why DicomCleaner is not cleaning up as per this
 file:
 https://github.com/pydicom/deid/blob/467b8bd76c6578683c47600b7194e3caed500fd9/deid/data/deid.dicom#L829
 
 
 • What would you have liked to have added? 
-1. Cleanup policy for each of the directories 2. Archival system for all dcm
-files received from customers 3. Error handling in case fof junk files/very large files received
+
+
+1. Cleanup policy for each of the directories 
+2. Archival system for all dcm files received from customers 
+3. Error handling in case fof junk files/very large files received
 
 
 
