@@ -84,6 +84,7 @@ def file_encoding():
         base64_file.close()
         print(writer)
         shutil.move(filename, "./encoded_images")
+    print("Processing Complete!")
 
 
 if __name__ == '__main__':
