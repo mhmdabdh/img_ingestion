@@ -9,9 +9,22 @@ of PHI and send it securely to Annalise backend.
 
 Python Modules used:
 
-pydicom         - to read the metadata of dicom images using python
-deid            - To get files, scrub images
-import shutil   - To 
-import os
-import pathlib
-import base64
+pydicom         
+- to read the metadata of dicom images using python
+
+  - deid            
+  To get files, scrub images
+  import shutil   - To 
+  import os
+  import pathlib
+  import base64
+
+
+|     |     |
+|:---       :|-----|
+|  pydicom   |     |
+|  deid   |     |
+|  shutil   |     |
+|     pathlib      |     |
+|     base64      |     |
+|     os      |     |
